@@ -3,9 +3,6 @@
 #include "countlines.h"
 
 void main (int argc, char** argv){
-   // Start...
-   printf("%s: Counting lines.\n", argv[0]);
-
    // For all files...
    int i, fd, curlines;
    int totlines = 0;

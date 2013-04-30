@@ -1,0 +1,38 @@
+echo "Uptime:"
+uptime
+
+echo "
+Trial I
+"
+echo -n "lc1:"
+time lc1 files/* > /dev/null
+echo -n "
+lc2:"
+time lc2 files/* > /dev/null
+echo -n "
+lc3:"
+time lc3 files/* > /dev/null
+
+echo "
+Trial II
+"
+echo -n "lc1:"
+time lc1 files/* > /dev/null
+echo -n "
+lc2:"
+time lc2 files/* > /dev/null
+echo -n "
+lc3:"
+time lc3 files/* > /dev/null
+
+echo "
+Trial III
+"
+echo -n "lc1:"
+time lc1 files/* > /dev/null
+echo -n "
+lc2:"
+time lc2 files/* > /dev/null
+echo -n "
+lc3:"
+time lc3 files/* > /dev/null

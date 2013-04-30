@@ -26,7 +26,7 @@ lc2.o: lc2.c countlines.h
 
 # Version 3:
 lc3: lc3.o countlines.o
-	$(COMP) $(FLAGS) lc3.o countlines.o -o lc3
+	$(COMP) $(FLAGS) -pthread lc3.o countlines.o -o lc3
 
 lc3.o: lc3.c countlines.h
 	gcc -c $(FLAGS) lc3.c
