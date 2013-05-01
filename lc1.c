@@ -29,6 +29,7 @@ void main (int argc, char** argv){
       closeFile(fd);
    }
 
-   // Print total:
+   // Print total, if needed:
+   if (totlines != curlines)
    printf("\033[32m%8d   total\033[0m\n", totlines);
 }
