@@ -1,8 +1,14 @@
 #include <errno.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "countlines.h"
 
+char* lc2name = "lc2";
+
 void main (int argc, char** argv){
+   // Check if being used by lc2.
+   int usedbylc2 = !strcmp(argv[0], lc2name);
+
    // For all files...
    int i, fd, curlines;
    int totlines = 0;
@@ -17,7 +23,9 @@ void main (int argc, char** argv){
 
       // Count the lines.
       curlines = countLines(fd);
-      if (curlines < 0){
+      if (usedbylc2)
+         write(1, &curlines, sizeof(int));
+      else if (curlines < 0){
          printf("     ERR   %s   ERR: Could not count.\n", argv[i]);
       }
       else{
@@ -30,6 +38,6 @@ void main (int argc, char** argv){
    }
 
    // Print total, if needed:
-   if (totlines != curlines)
+   if (totlines != curlines && !usedbylc2)
    printf("\033[32m%8d   total\033[0m\n", totlines);
 }

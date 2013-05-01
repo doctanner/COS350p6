@@ -1,44 +1,92 @@
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
+void printResults();
 void forkChild(char*);
 
 int numchildren = 0;
+int numjobs;
+
+char** jobs;
+int* infds;
 
 void main (int argc, char** argv){
-   // Set up pipe
-   int pipefd[2];
-   if (pipe(pipefd) != 0){
-      perror("Couldn't create pipe.");
+   // Set up arrays.
+   numjobs = argc - 1;
+   jobs = malloc(sizeof(char*) * numjobs);
+   infds = malloc(sizeof(int) * numjobs);
+
+   // Test mallocs.
+   if (jobs == NULL || infds == NULL){
+      fprintf(stderr, "Malloc error.");
       exit(1);
    }
-   int readfd = pipefd[0];
-   int writefd = pipefd[1];
+
+   // Set up stdout.
    int shout = dup(1);
 
-   // Set up stdout for children.
-   dup2(stdout, writefd);
-
    // Create children.
-   int i;
-   for (i = 1; i < argc; i++)
+   int pipefd[2];
+   int i, writefd;
+   for (i = 1; i < argc; i++){
+      // Set up pipe.
+      if (pipe(pipefd) != 0){
+         perror("Couldn't create pipe.");
+         exit(1);
+      }
+
+      // Save to arrays for output.
+      infds[i - 1] = pipefd[0];
+      jobs[i - 1] = argv[i];
+
+      // Replace stdout for child.
+      dup2(pipefd[1], 1);
+
+      // Fork child.
       forkChild(argv[i]);
+   }
+
+   // Reset stdout.
+   dup2(shout, 1);
 
    // Wait for children.
    int status;
    while(numchildren > 0){
       waitpid(-1, &status, 0);
-      // TODO Handle status.
+      numchildren--;
    }
 
-   // Write results.
-   char buf[100];
-   int chars;
-   while ((chars = read(readfd, &buf, 100)) > 0)
-      write(shout, &buf, chars);
+   // Print results.
+   printResults();
 }
 
+/* printResults
+ * Print the results that have been found. */
+void printResults(){
+   // Write results.
+   int val,i;
+   int totlines = 0;
+   for (i = 0; i < numjobs; i++){
+      read(infds[i], &val, sizeof(int));
+      if (val < 0){
+         fprintf(stdout,"     ERR   %s   ERR: Could not count.\n", jobs[i]);
+      }
+      else{
+         fprintf(stdout, "%8d   %s\n",val, jobs[i]);
+         totlines+=val;
+      }
+   }
+
+   // Write total.
+   if (numjobs > 1){
+      fprintf(stdout, "\033[32m%8d   total\033[0m\n",totlines);
+   }
+}
+
+/* forkChild
+ * Create a child process to do the work. */
 void forkChild(char* file){
    int pid = fork();
 

@@ -8,6 +8,7 @@ void processJob(void *);
 
 char* STR_TOTAL = "total";
 
+// Job stuct lets child and parent threads communicate.
 struct lc_job
 {
    char* file;
@@ -48,6 +49,8 @@ void main (int argc, char** argv){
    printf("\033[32m%8d   total\033[0m\n", totlines);
 }
 
+/* processJob
+ * Function run by each thread, to process a single job. */
 void processJob(void *arg){
    // Get job struct from argument.
    struct lc_job *job = (struct lc_job *) arg;
